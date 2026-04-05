@@ -1,6 +1,6 @@
 console.log("🔥 PRO TOOL LOADED");
 
-// ===== HIDDEN UID =====
+// ===== UID =====
 function getUID() {
     return atob("MjM4NjIyNTA=");
 }
@@ -26,82 +26,81 @@ function getUID() {
             position: fixed;
             bottom: 80px;
             right: 10px;
-            background: #000;
-            color: #0f0;
-            padding: 12px;
-            border-radius: 12px;
+            background: black;
+            color: lime;
+            padding: 10px;
             z-index: 9999;
-            font-size: 12px;
+            border-radius: 10px;
         `;
 
         box.innerHTML = `
-            <div>⚡ Auto Buyer PRO</div>
-            <input id="amt" placeholder="Amount" style="width:80px;">
+            <div>⚡ Auto Buyer</div>
+            <input id="amt" placeholder="Amount">
             <button id="go">Start</button>
             <div id="st">Idle</div>
         `;
 
         document.body.appendChild(box);
 
-        // ===== CORE ENGINE (ROBUST VERSION) =====
+        // ===== REAL ENGINE (MUTATION OBSERVER) =====
         function start(amount) {
 
-            document.getElementById("st").innerText = "Searching...";
+            document.getElementById("st").innerText = "Watching...";
 
-            const loop = setInterval(() => {
+            const observer = new MutationObserver(() => {
 
-                // Step 1: Find all elements containing ₹
-                const priceElements = Array.from(document.querySelectorAll("*"))
-                    .filter(el => el.innerText && el.innerText.includes("₹"));
+                const all = document.querySelectorAll("*");
 
-                for (let el of priceElements) {
+                for (let el of all) {
 
-                    if (!el.innerText.includes("₹" + amount)) continue;
+                    if (!el.innerText) continue;
 
-                    // Step 2: Try to find button nearby
-                    let parent = el;
+                    if (el.innerText.includes("₹" + amount)) {
 
-                    for (let i = 0; i < 10; i++) {
-                        if (!parent) break;
+                        let parent = el;
 
-                        // check buttons inside this container
-                        const buttons = parent.querySelectorAll("button");
+                        for (let i = 0; i < 6; i++) {
+                            if (!parent) break;
 
-                        for (let btn of buttons) {
-                            if (btn.offsetParent !== null) { // visible check
+                            const clickable = parent.querySelectorAll("button, div");
 
-                                btn.click();
+                            for (let btn of clickable) {
 
-                                document.getElementById("st").innerText = "✅ Bought ₹" + amount;
+                                if (
+                                    btn.innerText &&
+                                    btn.innerText.toLowerCase().includes("buy")
+                                ) {
+                                    btn.click();
 
-                                clearInterval(loop);
-                                return;
+                                    document.getElementById("st").innerText = "✅ Bought ₹" + amount;
+
+                                    observer.disconnect();
+                                    return;
+                                }
                             }
-                        }
 
-                        parent = parent.parentElement;
+                            parent = parent.parentElement;
+                        }
                     }
                 }
 
-            }, 250); // fast loop
+            });
+
+            observer.observe(document.body, {
+                childList: true,
+                subtree: true
+            });
         }
 
-        // ===== BUTTON =====
         document.getElementById("go").onclick = () => {
-
             const amount = document.getElementById("amt").value;
-
             if (!amount) return alert("Enter amount");
 
-            document.getElementById("st").innerText = "Waiting...";
-
-            setTimeout(() => {
-                start(amount);
-            }, 1000);
+            start(amount);
         };
 
     } catch (e) {
-        console.log("Error:", e);
+        console.log(e);
     }
 
 })();
