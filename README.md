@@ -1,2 +1,2 @@
 # Assistant-
-Controlled automation assistant
+Controlled  assistant
