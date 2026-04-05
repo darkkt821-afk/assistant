@@ -1,12 +1,11 @@
-console.log("SECURE TOOL LOADED");
+console.log("🔥 PRO TOOL LOADED");
 
-// ===== HIDDEN UID SYSTEM =====
+// ===== HIDDEN UID =====
 function getUID() {
-    // your hidden UID
     return atob("MjM4NjIyNTA=");
 }
 
-// ===== MAIN FUNCTION =====
+// ===== ACCESS CHECK =====
 (async () => {
 
     const UID = getUID();
@@ -28,57 +27,75 @@ function getUID() {
             position: fixed;
             bottom: 80px;
             right: 10px;
-            background: black;
-            color: white;
+            background: #000;
+            color: #0f0;
             padding: 12px;
             border-radius: 12px;
             z-index: 9999;
+            font-size: 12px;
         `;
 
         box.innerHTML = `
-            <div style="margin-bottom:5px;">⚡ Auto Buyer</div>
-            <input id="amt" placeholder="Amount" style="width:90px;">
+            <div>⚡ Auto Buyer PRO</div>
+            <input id="amt" placeholder="Amount" style="width:80px;">
             <button id="go">Start</button>
             <div id="st">Idle</div>
         `;
 
         document.body.appendChild(box);
 
-        // ===== AUTO BUY =====
+        // ===== CORE ENGINE (CLONE STYLE) =====
         function start(amount) {
+
+            let found = false;
             document.getElementById("st").innerText = "Searching...";
 
             const loop = setInterval(() => {
-                document.querySelectorAll("*").forEach(el => {
-                    if (el.innerText && el.innerText.includes("₹" + amount)) {
 
-                        let parent = el;
+                // Get all cards (important)
+                const cards = document.querySelectorAll("div");
 
-                        for (let i = 0; i < 5; i++) {
-                            if (!parent) break;
+                for (let card of cards) {
 
-                            const btn = parent.querySelector("button");
+                    // skip if already found
+                    if (found) break;
 
-                            if (btn && btn.innerText.includes("Buy")) {
-                                btn.click();
-                                document.getElementById("st").innerText = "✅ Bought ₹" + amount;
-                                clearInterval(loop);
-                                return;
-                            }
+                    const text = card.innerText;
 
-                            parent = parent.parentElement;
+                    // exact match for ₹ amount
+                    if (text && text.includes("₹" + amount)) {
+
+                        // find BUY button inside same card
+                        const btn = card.querySelector("button");
+
+                        if (btn && btn.innerText.includes("Buy")) {
+
+                            found = true;
+
+                            btn.click();
+
+                            document.getElementById("st").innerText = "✅ Bought ₹" + amount;
+
+                            clearInterval(loop);
+                            break;
                         }
                     }
-                });
-            }, 700);
+                }
+
+            }, 300); // faster than before
         }
 
         // ===== BUTTON =====
         document.getElementById("go").onclick = () => {
             const amount = document.getElementById("amt").value;
+
             if (!amount) return alert("Enter amount");
 
-            start(amount);
+            document.getElementById("st").innerText = "Waiting...";
+
+            setTimeout(() => {
+                start(amount);
+            }, 1200); // wait UI load
         };
 
     } catch (e) {
