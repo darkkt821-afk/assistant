@@ -2,10 +2,9 @@ console.log("🔥 PRO TOOL LOADED");
 
 // ===== HIDDEN UID =====
 function getUID() {
-    return atob("MjM4NjIyNTA="); // your UID
+    return atob("MjM4NjIyNTA=");
 }
 
-// ===== MAIN =====
 (async () => {
 
     const UID = getUID();
@@ -44,48 +43,50 @@ function getUID() {
 
         document.body.appendChild(box);
 
-        // ===== CORE ENGINE (FIXED) =====
+        // ===== CORE ENGINE (ROBUST VERSION) =====
         function start(amount) {
 
             document.getElementById("st").innerText = "Searching...";
 
-            // scroll to load items
-            window.scrollTo(0, document.body.scrollHeight);
-
             const loop = setInterval(() => {
 
-                // get all BUY buttons only
-                const buttons = Array.from(document.querySelectorAll("button"))
-                    .filter(btn => btn.innerText.trim().toLowerCase() === "buy");
+                // Step 1: Find all elements containing ₹
+                const priceElements = Array.from(document.querySelectorAll("*"))
+                    .filter(el => el.innerText && el.innerText.includes("₹"));
 
-                for (let btn of buttons) {
+                for (let el of priceElements) {
 
-                    let parent = btn;
+                    if (!el.innerText.includes("₹" + amount)) continue;
 
-                    // go UP DOM (important)
-                    for (let i = 0; i < 6; i++) {
-                        parent = parent.parentElement;
+                    // Step 2: Try to find button nearby
+                    let parent = el;
+
+                    for (let i = 0; i < 10; i++) {
                         if (!parent) break;
 
-                        const text = parent.innerText;
+                        // check buttons inside this container
+                        const buttons = parent.querySelectorAll("button");
 
-                        // match ₹ amount properly
-                        if (text && text.match(new RegExp(`₹\\s*${amount}\\b`))) {
+                        for (let btn of buttons) {
+                            if (btn.offsetParent !== null) { // visible check
 
-                            btn.click();
+                                btn.click();
 
-                            document.getElementById("st").innerText = "✅ Bought ₹" + amount;
+                                document.getElementById("st").innerText = "✅ Bought ₹" + amount;
 
-                            clearInterval(loop);
-                            return;
+                                clearInterval(loop);
+                                return;
+                            }
                         }
+
+                        parent = parent.parentElement;
                     }
                 }
 
-            }, 200); // fast loop
+            }, 250); // fast loop
         }
 
-        // ===== BUTTON CLICK =====
+        // ===== BUTTON =====
         document.getElementById("go").onclick = () => {
 
             const amount = document.getElementById("amt").value;
@@ -96,7 +97,7 @@ function getUID() {
 
             setTimeout(() => {
                 start(amount);
-            }, 1200); // wait UI load
+            }, 1000);
         };
 
     } catch (e) {
