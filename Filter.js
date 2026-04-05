@@ -1,4 +1,4 @@
-console.log("🔥 PRO TOOL LOADED");
+console.log("🔥 AUTO BUY + REFRESH TOOL");
 
 // ===== UID =====
 function getUID() {
@@ -42,18 +42,20 @@ function getUID() {
 
         document.body.appendChild(box);
 
-        // ===== REAL ENGINE (MUTATION OBSERVER) =====
+        // ===== MAIN ENGINE =====
         function start(amount) {
 
-            document.getElementById("st").innerText = "Watching...";
+            document.getElementById("st").innerText = "Running...";
 
-            const observer = new MutationObserver(() => {
+            const loop = setInterval(() => {
 
-                const all = document.querySelectorAll("*");
+                let found = false;
 
-                for (let el of all) {
+                // 🔍 Step 1: Search amount
+                const elements = Array.from(document.querySelectorAll("*"))
+                    .filter(el => el.innerText && el.innerText.includes("₹"));
 
-                    if (!el.innerText) continue;
+                for (let el of elements) {
 
                     if (el.innerText.includes("₹" + amount)) {
 
@@ -62,38 +64,57 @@ function getUID() {
                         for (let i = 0; i < 6; i++) {
                             if (!parent) break;
 
-                            const clickable = parent.querySelectorAll("button, div");
+                            const btns = parent.querySelectorAll("button, div");
 
-                            for (let btn of clickable) {
+                            for (let btn of btns) {
+                                if (btn.innerText && btn.innerText.toLowerCase().includes("buy")) {
 
-                                if (
-                                    btn.innerText &&
-                                    btn.innerText.toLowerCase().includes("buy")
-                                ) {
                                     btn.click();
 
                                     document.getElementById("st").innerText = "✅ Bought ₹" + amount;
 
-                                    observer.disconnect();
+                                    clearInterval(loop);
                                     return;
                                 }
                             }
 
                             parent = parent.parentElement;
                         }
+
+                        found = true;
                     }
                 }
 
-            });
+                // 🔄 Step 2: If NOT found → click refresh
+                if (!found) {
 
-            observer.observe(document.body, {
-                childList: true,
-                subtree: true
-            });
+                    document.getElementById("st").innerText = "Refreshing...";
+
+                    const refreshBtn = Array.from(document.querySelectorAll("button, div"))
+                        .find(el =>
+                            el.innerHTML &&
+                            (
+                                el.innerHTML.includes("svg") ||   // icon button
+                                el.innerText.toLowerCase().includes("refresh")
+                            )
+                        );
+
+                    if (refreshBtn) {
+                        refreshBtn.click();
+                        console.log("🔄 Refresh clicked");
+                    } else {
+                        console.log("❌ Refresh button not found");
+                    }
+                }
+
+            }, 1500); // repeat every 1.5 sec
         }
 
+        // ===== BUTTON =====
         document.getElementById("go").onclick = () => {
+
             const amount = document.getElementById("amt").value;
+
             if (!amount) return alert("Enter amount");
 
             start(amount);
