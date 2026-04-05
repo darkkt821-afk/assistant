@@ -2,10 +2,10 @@ console.log("🔥 PRO TOOL LOADED");
 
 // ===== HIDDEN UID =====
 function getUID() {
-    return atob("MjM4NjIyNTA=");
+    return atob("MjM4NjIyNTA="); // your UID
 }
 
-// ===== ACCESS CHECK =====
+// ===== MAIN =====
 (async () => {
 
     const UID = getUID();
@@ -44,49 +44,50 @@ function getUID() {
 
         document.body.appendChild(box);
 
-        // ===== CORE ENGINE (CLONE STYLE) =====
+        // ===== CORE ENGINE (FIXED) =====
         function start(amount) {
 
-            let found = false;
             document.getElementById("st").innerText = "Searching...";
+
+            // scroll to load items
+            window.scrollTo(0, document.body.scrollHeight);
 
             const loop = setInterval(() => {
 
-                // Get all cards (important)
-                const cards = document.querySelectorAll("div");
+                // get all BUY buttons only
+                const buttons = Array.from(document.querySelectorAll("button"))
+                    .filter(btn => btn.innerText.trim().toLowerCase() === "buy");
 
-                for (let card of cards) {
+                for (let btn of buttons) {
 
-                    // skip if already found
-                    if (found) break;
+                    let parent = btn;
 
-                    const text = card.innerText;
+                    // go UP DOM (important)
+                    for (let i = 0; i < 6; i++) {
+                        parent = parent.parentElement;
+                        if (!parent) break;
 
-                    // exact match for ₹ amount
-                    if (text && text.includes("₹" + amount)) {
+                        const text = parent.innerText;
 
-                        // find BUY button inside same card
-                        const btn = card.querySelector("button");
-
-                        if (btn && btn.innerText.includes("Buy")) {
-
-                            found = true;
+                        // match ₹ amount properly
+                        if (text && text.match(new RegExp(`₹\\s*${amount}\\b`))) {
 
                             btn.click();
 
                             document.getElementById("st").innerText = "✅ Bought ₹" + amount;
 
                             clearInterval(loop);
-                            break;
+                            return;
                         }
                     }
                 }
 
-            }, 300); // faster than before
+            }, 200); // fast loop
         }
 
-        // ===== BUTTON =====
+        // ===== BUTTON CLICK =====
         document.getElementById("go").onclick = () => {
+
             const amount = document.getElementById("amt").value;
 
             if (!amount) return alert("Enter amount");
