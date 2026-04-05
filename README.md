@@ -1,2 +1,2 @@
-# Assistant-
+# Assistant
 Controlled  assistant
