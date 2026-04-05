@@ -1,70 +1,87 @@
+console.log("MAIN JS LOADED");
+
+// ===== UID CHECK =====
 (async () => {
 
-    // ===== UID CHECK =====
-    const UID = "23862250"; // your uid
+    const UID = "23862250";
 
-    const res = await fetch("https://raw.githubusercontent.com/darkkt821-afk/Assistant/main/users.json");
-    const data = await res.json();
+    try {
+        const res = await fetch("https://raw.githubusercontent.com/darkkt821-afk/assistant/main/users.json");
+        const data = await res.json();
 
-    if (!data.allowedUIDs.includes(UID)) {
-        alert("Access Denied");
-        return;
-    }
+        if (!data.allowedUIDs.includes(UID)) {
+            alert("Access Denied");
+            return;
+        }
 
-    console.log("Access Granted");
+        console.log("Access Granted");
 
-    // ===== CREATE UI =====
-    const box = document.createElement("div");
-    box.style = `
-        position: fixed;
-        bottom: 80px;
-        right: 10px;
-        background: black;
-        color: white;
-        padding: 10px;
-        border-radius: 10px;
-        z-index: 9999;
-    `;
+        // ===== UI =====
+        const box = document.createElement("div");
+        box.style = `
+            position: fixed;
+            bottom: 80px;
+            right: 10px;
+            background: black;
+            color: white;
+            padding: 12px;
+            border-radius: 12px;
+            z-index: 9999;
+            font-size: 14px;
+        `;
 
-    box.innerHTML = `
-        <div style="margin-bottom:5px;">Auto Buyer</div>
-        <input id="amountInput" placeholder="Enter Amount" style="width:100px;">
-        <button id="startBtn">Start</button>
-        <div id="status" style="margin-top:5px;">Idle</div>
-    `;
+        box.innerHTML = `
+            <div style="margin-bottom:5px;">⚡ Auto Buyer</div>
+            <input id="amountInput" placeholder="Amount" style="width:90px;">
+            <button id="startBtn">Start</button>
+            <div id="status" style="margin-top:5px;">Idle</div>
+        `;
 
-    document.body.appendChild(box);
+        document.body.appendChild(box);
 
-    // ===== AUTO BUY FUNCTION =====
-    function startAutoBuy(amount) {
-        document.getElementById("status").innerText = "Searching...";
+        // ===== AUTO BUY =====
+        function startAutoBuy(amount) {
+            document.getElementById("status").innerText = "Searching...";
 
-        const interval = setInterval(() => {
-            const items = document.querySelectorAll("div");
+            const interval = setInterval(() => {
+                const all = document.querySelectorAll("*");
 
-            items.forEach(el => {
-                if (el.innerText.includes("₹" + amount)) {
+                all.forEach(el => {
+                    if (el.innerText && el.innerText.includes("₹" + amount)) {
 
-                    const btn = el.parentElement.querySelector("button");
+                        let parent = el;
 
-                    if (btn && btn.innerText === "Buy") {
-                        btn.click();
+                        for (let i = 0; i < 5; i++) {
+                            if (!parent) break;
 
-                        document.getElementById("status").innerText = "Bought ₹" + amount;
-                        clearInterval(interval);
+                            const btn = parent.querySelector("button");
+
+                            if (btn && btn.innerText.includes("Buy")) {
+                                btn.click();
+
+                                document.getElementById("status").innerText = "✅ Bought ₹" + amount;
+                                clearInterval(interval);
+                                return;
+                            }
+
+                            parent = parent.parentElement;
+                        }
                     }
-                }
-            });
+                });
 
-        }, 1000);
+            }, 800);
+        }
+
+        // ===== BUTTON =====
+        document.getElementById("startBtn").onclick = () => {
+            const amt = document.getElementById("amountInput").value;
+            if (!amt) return alert("Enter amount");
+
+            startAutoBuy(amt);
+        };
+
+    } catch (e) {
+        console.log("Error:", e);
     }
-
-    // ===== BUTTON CLICK =====
-    document.getElementById("startBtn").onclick = () => {
-        const amt = document.getElementById("amountInput").value;
-        if (!amt) return alert("Enter amount");
-
-        startAutoBuy(amt);
-    };
 
 })();
