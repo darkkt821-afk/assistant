@@ -1,20 +1,26 @@
-console.log("MAIN JS LOADED");
+console.log("SECURE TOOL LOADED");
 
-// ===== UID CHECK =====
+// ===== HIDDEN UID SYSTEM =====
+function getUID() {
+    // your hidden UID
+    return atob("MjM4NjIyNTA=");
+}
+
+// ===== MAIN FUNCTION =====
 (async () => {
 
-    const UID = "23862250";
+    const UID = getUID();
 
     try {
         const res = await fetch("https://raw.githubusercontent.com/darkkt821-afk/assistant/main/users.json");
         const data = await res.json();
 
         if (!data.allowedUIDs.includes(UID)) {
-            alert("Access Denied");
+            alert("❌ Access Denied");
             return;
         }
 
-        console.log("Access Granted");
+        console.log("✅ Access Granted");
 
         // ===== UI =====
         const box = document.createElement("div");
@@ -27,26 +33,23 @@ console.log("MAIN JS LOADED");
             padding: 12px;
             border-radius: 12px;
             z-index: 9999;
-            font-size: 14px;
         `;
 
         box.innerHTML = `
             <div style="margin-bottom:5px;">⚡ Auto Buyer</div>
-            <input id="amountInput" placeholder="Amount" style="width:90px;">
-            <button id="startBtn">Start</button>
-            <div id="status" style="margin-top:5px;">Idle</div>
+            <input id="amt" placeholder="Amount" style="width:90px;">
+            <button id="go">Start</button>
+            <div id="st">Idle</div>
         `;
 
         document.body.appendChild(box);
 
         // ===== AUTO BUY =====
-        function startAutoBuy(amount) {
-            document.getElementById("status").innerText = "Searching...";
+        function start(amount) {
+            document.getElementById("st").innerText = "Searching...";
 
-            const interval = setInterval(() => {
-                const all = document.querySelectorAll("*");
-
-                all.forEach(el => {
+            const loop = setInterval(() => {
+                document.querySelectorAll("*").forEach(el => {
                     if (el.innerText && el.innerText.includes("₹" + amount)) {
 
                         let parent = el;
@@ -58,9 +61,8 @@ console.log("MAIN JS LOADED");
 
                             if (btn && btn.innerText.includes("Buy")) {
                                 btn.click();
-
-                                document.getElementById("status").innerText = "✅ Bought ₹" + amount;
-                                clearInterval(interval);
+                                document.getElementById("st").innerText = "✅ Bought ₹" + amount;
+                                clearInterval(loop);
                                 return;
                             }
 
@@ -68,16 +70,15 @@ console.log("MAIN JS LOADED");
                         }
                     }
                 });
-
-            }, 800);
+            }, 700);
         }
 
         // ===== BUTTON =====
-        document.getElementById("startBtn").onclick = () => {
-            const amt = document.getElementById("amountInput").value;
-            if (!amt) return alert("Enter amount");
+        document.getElementById("go").onclick = () => {
+            const amount = document.getElementById("amt").value;
+            if (!amount) return alert("Enter amount");
 
-            startAutoBuy(amt);
+            start(amount);
         };
 
     } catch (e) {
